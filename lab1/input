@@ -1,0 +1,10 @@
+unsigned long long
+float
+9471209571289
+2323.2222
+s Sum +
+s Sub -
+s Mul *
+s Div /
+c (arg1 + arg2) / arg1 * 100
+c (arg1 - arg2) / arg2 * 100
