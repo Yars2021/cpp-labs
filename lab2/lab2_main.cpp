@@ -1,12 +1,16 @@
 #include <iostream>
-#include "pystring.hpp"
+#include "superstring.hpp"
 
 using namespace std;
 
 int main() {
-    PYString str("Hello, World!");
+    SuperString str("Hello, World!");
 
-    cout << str[-1] << endl;
+    cout << str.length() << ' ' << str[-1] << endl;
+
+    str += "123";
+
+    cout << (str == "Hello, World!123") << endl;
 
     return 0;
 }
