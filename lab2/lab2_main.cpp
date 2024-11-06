@@ -8,9 +8,10 @@ int main() {
 
     cout << str.length() << ' ' << str[-1] << endl;
 
-    str += "123";
-
-    cout << (str == "Hello, World!123") << endl;
+    for (unsigned int i = 0; i < str.length(); cout << str[i++]);
+    cout << endl;
+    for (unsigned int i = 0; i < str.length(); cout << str[-i++]);
+    cout << endl;
 
     return 0;
 }
