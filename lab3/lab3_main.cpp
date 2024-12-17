@@ -36,8 +36,9 @@ int main() {
     vector<SuperString> v2(v1.end() - 200, v1.end());
 
     // 3. Create list1 as a 20-50 sorted slice of v1
-    sort(v1.begin() + 20, v1.begin() + 50 + 1);
-    list<SuperString> list1(v1.begin() + 20, v1.begin() + 50 + 1);
+    int l1_s = (rand() % 30 + 20 + 1);
+    sort(v1.end() - l1_s, v1.end());
+    list<SuperString> list1(v1.end() - l1_s, v1.end());
 
     // 4. Create list2 as a rand(20, 50) slice of smallest items of v2
     sort(v2.begin(), v2.end());
