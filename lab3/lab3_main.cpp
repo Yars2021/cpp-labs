@@ -45,7 +45,7 @@ int main() {
     list<SuperString> list2(v2.begin(), v2.begin() + rand() % 30 + 20);
 
     // 5. Remove list1 from v1 and list2 from v2
-    v1.erase(v1.end() - 200, v1.end());
+    v1.erase(v1.end() - l1_s, v1.end());
     v2.erase(v2.begin(), v2.begin() + list2.size() + 1);
 
     // 6. Find avg and sort list1
