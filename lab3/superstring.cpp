@@ -1,11 +1,21 @@
 #include "superstring.hpp"
+#include <ctime>
+#include <cstdlib>
 #include <stdexcept>
+
 
 SuperString::SuperString() {
     this->size = 0;
     this->buffer = nullptr;
+}
 
-    std::cout << "SuperString()" << std::endl;
+SuperString::SuperString(int min_len, int max_len) {
+    this->size = rand() % (max_len - min_len) + min_len;
+    this->buffer = new char[this->size];
+
+    for (int i = 0; i < this->size; i++) {
+        this->buffer[i] = (rand() % ('Z' - 'A') + 'A');
+    }
 }
 
 SuperString::SuperString(const char *str) {
@@ -16,8 +26,6 @@ SuperString::SuperString(const char *str) {
     for (unsigned int i = 0; i < this->size; i++) {
         this->buffer[i] = str[i];
     }
-
-    std::cout << "SuperString(const char *str)" << std::endl;
 }
 
 SuperString::SuperString(const SuperString &str) {
@@ -27,8 +35,6 @@ SuperString::SuperString(const SuperString &str) {
     for (unsigned int i = 0; i < str.size; i++) {
         this->buffer[i] = str.buffer[i];
     }
-
-    std::cout << "SuperString(const SuperString &str)" << std::endl;
 }
 
 SuperString::SuperString(const std::string &str) {
@@ -38,26 +44,33 @@ SuperString::SuperString(const std::string &str) {
     for (unsigned int i = 0; i < str.size(); i++) {
         this->buffer[i] = str[i];
     }
-
-    std::cout << "SuperString(const std::string &str)" << std::endl;
 }
 
 SuperString::SuperString(SuperString &&str) {
     this->size = str.size;
     std::swap(this->buffer, str.buffer);
-
-    std::cout << "SuperString(SuperString &&str)" << std::endl;
 }
 
 SuperString::~SuperString() {
     this->size = 0;
     delete(this->buffer);
-
-    std::cout << "~SuperString()" << std::endl;
 }
 
 unsigned int SuperString::length() {
     return this->size;
+}
+
+SuperString & SuperString::operator=(const SuperString &operand) {
+    if (this->size > 0) delete(this->buffer);
+
+    this->size = operand.size;
+    this->buffer = new char[this->size];
+
+    for (int i = 0; i < this->size; i++) {
+        this->buffer[i] = operand.buffer[i];
+    }
+
+    return *this;
 }
 
 const char & SuperString::operator[](int index) {
@@ -124,4 +137,12 @@ void SuperString::operator+=(const SuperString &other) {
     this->size += other.size;
     delete this->buffer;
     this->buffer = buffer;
+}
+
+void SuperString::print(std::ostream &out_stream) {
+    for (int i = 0; i < this->size; i++) {
+        out_stream << this->buffer[i];
+    }
+
+    out_stream << '\n';
 }

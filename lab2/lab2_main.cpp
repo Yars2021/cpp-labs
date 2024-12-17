@@ -16,7 +16,7 @@ void simple_demo() {
 }
 
 SuperString pass(SuperString in) {
-    return SuperString(in);;
+    return SuperString(in);
 }
 
 int main() {
