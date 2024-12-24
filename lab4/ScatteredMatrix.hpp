@@ -1,7 +1,3 @@
-//
-// Created by yars on 18.12.24.
-//
-
 #ifndef CPP_LABS_SCATTEREDMATRIX_HPP
 #define CPP_LABS_SCATTEREDMATRIX_HPP
 
@@ -10,143 +6,101 @@
 #include <unordered_map>
 
 
-template <typename T> class ScatteredMatrix {
-    private:
-        unsigned int width;
-        unsigned int height;
-        T default_value;
-        std::unordered_map<std::pair<unsigned int, unsigned int>, T> values;
-    public:
-        ScatteredMatrix(unsigned int width, unsigned int height, T &default_value);
-        ScatteredMatrix(unsigned int width, unsigned int height, T &default_value, T *matrix);
-        ScatteredMatrix(ScatteredMatrix<T> &matrix);
-        ~ScatteredMatrix();
-        unsigned int get_width();
-        unsigned int get_height();
-        T get_default_value();
-        T get(unsigned int width, unsigned int height);
-        void set(unsigned int width, unsigned int height, T &value);
-        void transpose();
-        void map(T map_func(T &value));
-        ScatteredMatrix<T> & operator=(const ScatteredMatrix<T> &matrix);
-        ScatteredMatrix<T> & operator+(const ScatteredMatrix<T> &matrix);
-        ScatteredMatrix<T> & operator-(const ScatteredMatrix<T> &matrix);
-        ScatteredMatrix<T> & operator*(const ScatteredMatrix<T> &matrix);
-        bool operator==(const ScatteredMatrix<T> &matrix);
-        bool operator!=(const ScatteredMatrix<T> &matrix);
-        void print(std::ostream &out_stream);
+struct IndexHash {
+    template <class T1, class T2> std::size_t operator() (const std::pair<T1, T2>& pair) const {
+        return std::hash<T1>{}(pair.first) ^ (std::hash<T2>{}(pair.second) << 1);
+    }
 };
 
-template <typename T> ScatteredMatrix<T>::ScatteredMatrix(unsigned int width,  unsigned int height, T &default_value) {
-    this->width = width;
-    this->height = height;
-    this->default_value = default_value;
-}
 
-template <typename T> ScatteredMatrix<T>::ScatteredMatrix(unsigned int width, unsigned int height, T &default_value, T *matrix) {
-    this->width = width;
-    this->height = height;
-    this->default_value = default_value;
+template <typename T> class ScatteredMatrix {
+    private:
+        unsigned int rows, cols;
+    public:
+        std::unordered_map<std::pair<unsigned int, unsigned int>, T, IndexHash> values;
 
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            this->values[{i, j}] = matrix[i][j];
+        ScatteredMatrix(unsigned int rows, unsigned int cols) {
+            this->rows = rows;
+            this->cols = cols;
         }
-    }
-}
 
-template <typename T> ScatteredMatrix<T>::ScatteredMatrix(ScatteredMatrix<T> &matrix) {
-    this->width = matrix.get_width();
-    this->height = matrix.get_height();
-    this->default_value = matrix.get_default_value();
-
-    for (int i = 0; i < this->width; i++) {
-        for (int j = 0; j < this->height; j++) {
-            this->values[{i, j}] = matrix.get(i, j);
+        unsigned int get_rows() {
+            return this->rows;
         }
-    }
-}
 
-template <typename T> ScatteredMatrix<T>::~ScatteredMatrix() {
-    this->width = 0;
-    this->height = 0;
-}
-
-template <typename T> unsigned int ScatteredMatrix<T>::get_width() {
-    return this->width;
-}
-
-template <typename T> unsigned int ScatteredMatrix<T>::get_height() {
-    return this->height;
-}
-
-template <typename T> T ScatteredMatrix<T>::get_default_value() {
-    return this->default_value;
-}
-
-template <typename T> T ScatteredMatrix<T>::get(unsigned int width, unsigned int height) {
-    if (width >= this->width || height >= this->height) return this->default_value;
-    if (this->values.find({width, height}) == this->values.end()) return this->default_value;
-    return this->values[{width, height}];
-}
-
-template <typename T> void ScatteredMatrix<T>::set(unsigned int width, unsigned int height, T &value) {
-    if (width >= this->width || height >= this->height) return;
-    this->values[{width, height}] = value;
-}
-
-template <typename T> void ScatteredMatrix<T>::transpose() {
-    for (int i = 0; i < this->width; i++) {
-        for (int j = 0; j < this->height; j++) {
-            
+        unsigned int get_cols() {
+            return this->cols;
         }
-    }
-}
 
-template <typename T> void ScatteredMatrix<T>::map(T map_func(T &value)) {
-
-}
-
-template <typename T> ScatteredMatrix<T> & ScatteredMatrix<T>::operator=(const ScatteredMatrix<T> &matrix) {
-
-}
-
-template <typename T> ScatteredMatrix<T> & ScatteredMatrix<T>::operator+(const ScatteredMatrix<T> &matrix) {
-
-}
-
-template <typename T> ScatteredMatrix<T> & ScatteredMatrix<T>::operator-(const ScatteredMatrix<T> &matrix) {
-
-}
-
-template <typename T> ScatteredMatrix<T> & ScatteredMatrix<T>::operator*(const ScatteredMatrix<T> &matrix) {
-
-}
-
-template <typename T> bool ScatteredMatrix<T>::operator==(const ScatteredMatrix<T> &matrix) {
-    if (this->width != matrix.get_width() || this->height != matrix.get_height() || this->default_value != matrix.get_default_value()) return false;
-
-    for (int i = 0; i < width; i++) {
-        for (int j = 0; j < height; j++) {
-            if (this->get(i, j) != matrix.get(i, j)) return false;
+        void set(unsigned int row, unsigned int col, T value) {
+            if (value != 0) {
+                this->values[std::make_pair(row, col)] = value;
+            } else {
+                this->values.erase(std::make_pair(row, col));
+            }
         }
-    }
 
-    return true;
-}
-
-template <typename T> bool ScatteredMatrix<T>::operator!=(const ScatteredMatrix<T> &matrix) {
-    return false == (*this == matrix);
-}
-
-template <typename T> void ScatteredMatrix<T>::print(std::ostream &out_stream) {
-    for (int i = 0; i < this->height; i++) {
-        for (int j = 0; j < this->width; j++) {
-            out_stream << this->get(i, j) << ' ';
+        T get(unsigned int row, unsigned int col) {
+            auto it = this->values.find({row, col});
+            return (it == this->values.end()) ? 0 : it->second;
         }
-        out_stream << '\n';
-    }
-    out_stream << '\n';
-}
+
+        ScatteredMatrix<T> operator+(ScatteredMatrix<T> &other) {
+            ScatteredMatrix<T> sum(this->rows, this->cols);
+
+            for (auto &pos : this->values) {
+                sum.set(pos.first.first, pos.first.second, pos.second + other.get(pos.first.first, pos.first.second));
+            }
+
+            return sum;
+        }
+
+        ScatteredMatrix<T> operator*(ScatteredMatrix<T>& other) {
+            ScatteredMatrix<T> prod(this->get_rows(), other.get_cols());
+
+            for (unsigned int i = 0; i < this->rows; i++) {
+                for (unsigned int j = 0; j < other.get_cols(); j++) {
+                    T res = 0;
+
+                    for (unsigned int k = 0; k < other.get_rows(); k++) {
+                        res += this->get(i, k) * other.get(k, j);
+                    }
+
+                    prod.set(i, j, res);
+                }
+            }
+
+            return prod;
+        }
+
+        ScatteredMatrix<T> transpose() {
+            ScatteredMatrix<T> transposed(this->cols, this->rows);
+
+            for (auto &pos : this->values) {
+                transposed.set(pos.first.second, pos.first.first, pos.second);
+            }
+
+            return transposed;
+        }
+
+        ScatteredMatrix<T> map(int a) {
+            ScatteredMatrix<T> mapped(this->rows, this->cols);
+
+            for (auto &pos : this->values) {
+                mapped.set(pos.first.first, pos.first.second, func(pos.second));
+            }
+
+            return mapped;
+        }
+
+        void print(std::ostream& stream) {
+            for (unsigned int i = 0; i < this->get_rows(); i++) {
+                for (unsigned int j = 0; j < this->get_cols(); j++) {
+                    stream << this->get(i, j) << " ";
+                }
+                stream << std::endl;
+            }
+        }
+};
 
 #endif //CPP_LABS_SCATTEREDMATRIX_HPP
